@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+      - development
+      - staging
+      - 'feature/**'
+      - 'release/**'
   workflow_dispatch:
 
 env:
@@ -39,6 +43,62 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ secrets.AWS_ROLE_NAME }}
           role-session-name: github-action-keysely-admin-panel-backend-role-session
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check if AWS credentials are configured
+        run: aws sts get-caller-identity
+
+  deploy-dev:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/development' || startsWith(github.ref, 'refs/heads/feature/')
+    environment: development
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ secrets.AWS_ROLE_NAME }}
+          role-session-name: github-action-keysely-admin-panel-backend-dev-role-session
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check if AWS credentials are configured
+        run: aws sts get-caller-identity
+
+  deploy-stage:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/staging' || startsWith(github.ref, 'refs/heads/release/')
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ secrets.AWS_ROLE_NAME }}
+          role-session-name: github-action-keysely-admin-panel-backend-stage-role-session
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Check if AWS credentials are configured
