@@ -7,18 +7,20 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: us-east-1
-  NODE_VERSION: '20.x'
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  NODE_VERSION: ${{ vars.NODE_VERSION }}
+  AWS_ACCOUNT_NUMBER: ${{ vars.AWS_ACCOUNT_NUMBER }}
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  deploy:
-    name: Deploy CDK Stack
+  deploy-prod:
+    name: Deploy to Production
     runs-on: ubuntu-latest
-
+    if: github.ref == 'refs/heads/main'
+    environment: production
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -36,14 +38,12 @@ jobs:
         run: npm run build
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/${{ secrets.AWS_ROLE_NAME }}
+          role-session-name: github-action-keysely-admin-panel-backend-role-session
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: CDK Synth
-        run: npm run cdk:synth
-
-      - name: CDK Deploy
-        run: npm run cdk:deploy -- --require-approval never
+      - name: Check if AWS credentials are configured
+        run: aws sts get-caller-identity
 
