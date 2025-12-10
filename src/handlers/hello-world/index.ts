@@ -6,10 +6,11 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { logger } from '../../utils/logger';
 
-export const handler = async (
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> => {
+export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info({ event }, 'Hello World Handler started');
+
   return {
     statusCode: 200,
     body: JSON.stringify({
