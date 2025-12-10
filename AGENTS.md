@@ -10,7 +10,8 @@ This is a **serverless backend** for the Keysely Admin Panel.
 - **Region**: `us-east-1`
 
 ## Technology Stack
-- **Runtime**: Node.js (v20.x+)
+
+- **Runtime**: Node.js (v22.x+)
 - **Language**: TypeScript
 - **Infrastructure**: AWS CDK (v2)
 - **CI/CD**: GitHub Actions (OIDC authentication)
