@@ -44,8 +44,8 @@ jobs:
           role-session-name: github-action-keysely-admin-panel-backend-role-session
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Check if AWS credentials are configured
-        run: aws sts get-caller-identity
+      - name: Deploy to Production
+        run: bun run cdk:deploy -- --require-approval never
 
   deploy-dev:
     name: Deploy to Development
@@ -71,8 +71,8 @@ jobs:
           role-session-name: github-action-keysely-admin-panel-backend-dev-role-session
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Check if AWS credentials are configured
-        run: aws sts get-caller-identity
+      - name: Deploy to Development
+        run: bun run cdk:deploy -- --require-approval never
 
   deploy-stage:
     name: Deploy to Staging
@@ -98,5 +98,5 @@ jobs:
           role-session-name: github-action-keysely-admin-panel-backend-stage-role-session
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Check if AWS credentials are configured
-        run: aws sts get-caller-identity
+      - name: Deploy to Staging
+        run: bun run cdk:deploy -- --require-approval never
