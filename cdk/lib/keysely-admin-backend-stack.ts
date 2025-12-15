@@ -29,18 +29,15 @@ export class KeyselyAdminBackendStack extends cdk.Stack {
     // IAM Role for GitHub Actions with CDK deployment permissions
     const githubActionsRole = new iam.Role(this, 'GitHubActionsRole', {
       roleName: 'KeyselyAdminBackend-GitHubActionsRole',
-      assumedBy: new iam.WebIdentityPrincipal(
-        githubProvider.openIdConnectProviderArn,
-        {
-          StringEquals: {
-            'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
-          },
-          StringLike: {
-            'token.actions.githubusercontent.com:sub':
-              'repo:onimenotsuki/keysely-admin-panel-backend:ref:refs/heads/main',
-          },
-        }
-      ),
+      assumedBy: new iam.WebIdentityPrincipal(githubProvider.openIdConnectProviderArn, {
+        StringEquals: {
+          'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
+        },
+        StringLike: {
+          'token.actions.githubusercontent.com:sub':
+            'repo:onimenotsuki/keysely-admin-panel-backend:ref:refs/heads/main',
+        },
+      }),
       description: 'IAM Role for GitHub Actions to deploy Keysely Admin Panel Backend',
       maxSessionDuration: cdk.Duration.hours(1),
     });
@@ -80,4 +77,3 @@ export class KeyselyAdminBackendStack extends cdk.Stack {
     });
   }
 }
-

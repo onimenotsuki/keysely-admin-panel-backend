@@ -11,4 +11,3 @@ new KeyselyAdminBackendStack(app, 'KeyselyAdminBackendStack', {
   },
   description: 'Keysely Admin Panel Backend - Serverless infrastructure',
 });
-

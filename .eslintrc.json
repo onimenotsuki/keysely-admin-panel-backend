@@ -5,10 +5,7 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "plugins": ["@typescript-eslint"],
   "rules": {
     "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
@@ -20,4 +17,3 @@
     "es2020": true
   }
 }
-

@@ -1,49 +1,71 @@
-import express from 'express';
-import { APIGatewayProxyEvent } from 'aws-lambda';
-import { handler } from './handlers/hello-world';
-import dotenv from 'dotenv';
 import { logger } from './utils/logger';
+import helloWorldHandler from './handlers/hello-world';
+import healthCheckHandler from './handlers/health';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
-dotenv.config();
+const port = parseInt(process.env.PORT || '3000', 10);
 
-const app = express();
-const port = process.env.PORT || 3000;
+async function transformEvent(
+  req: Request,
+  handler: (event: APIGatewayProxyEvent) => Promise<APIGatewayProxyResult>
+) {
+  const url = new URL(req.url);
 
-app.use(express.json());
+  logger.info(`Received request: ${req.method} ${url.pathname}`);
 
-app.all('/*', async (req, res) => {
-  logger.info(`Received request: ${req.method} ${req.path}`);
+  const headers: { [key: string]: string } = {};
+  req.headers.forEach((value, key) => {
+    headers[key] = value;
+  });
+
+  const query: { [key: string]: string } = {};
+  url.searchParams.forEach((value, key) => {
+    query[key] = value;
+  });
+
+  let bodyString: string | null = null;
+  if (req.body) {
+    bodyString = await req.text();
+  }
 
   // Construct API Gateway Event
   const event: Partial<APIGatewayProxyEvent> = {
-    path: req.path,
+    path: url.pathname,
     httpMethod: req.method,
-    headers: req.headers as { [name: string]: string },
-    queryStringParameters: req.query as { [name: string]: string },
-    body: JSON.stringify(req.body),
+    headers: headers,
+    queryStringParameters: query,
+    body: bodyString,
     isBase64Encoded: false,
   };
 
   try {
     const result = await handler(event as APIGatewayProxyEvent);
 
-    // Parse body if it's a string
-    let body = result.body;
-    try {
-      if (typeof result.body === 'string') {
-        body = JSON.parse(result.body);
+    return new Response(
+      typeof result.body === 'string' ? result.body : JSON.stringify(result.body),
+      {
+        status: result.statusCode,
+        headers: result.headers as HeadersInit,
       }
-    } catch (e) {
-      // keep as string if parsing fails
-    }
-
-    res.status(result.statusCode).set(result.headers).send(body);
+    );
   } catch (error) {
     logger.error({ err: error }, 'Error invoking function');
-    res.status(500).json({ error: 'Internal Server Error' });
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
+}
+
+const routes = {
+  '/hello': async (req: Request) => await transformEvent(req, helloWorldHandler),
+  '/health': async (req: Request) => await transformEvent(req, healthCheckHandler),
+};
+
+const server = Bun.serve({
+  development: Bun.env.NODE_ENV !== 'production',
+  port,
+  routes,
 });
 
-app.listen(port, () => {
-  logger.info(`Local server listening at http://localhost:${port}`);
-});
+logger.info(`Local server listening at http://localhost:${server.port}`);

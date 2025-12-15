@@ -1,12 +1,12 @@
-FROM node:22-alpine
+FROM oven/bun:1-alpine
 
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package.json bun.lock ./
 
 # Install dependencies
-RUN npm install
+RUN bun install --frozen-lockfile
 
 # Copy source code
 COPY . .
@@ -15,5 +15,4 @@ COPY . .
 EXPOSE $PORT
 
 # Start local server
-# Using ts-node to run directly without building
-CMD ["npx", "ts-node", "src/local-server.ts"]
+CMD ["bun", "src/local-server.ts"]

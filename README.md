@@ -11,6 +11,7 @@ This project uses **Amazon API Gateway** to trigger Lambda functions, providing 
 Before you begin, ensure you have the following installed on your machine:
 
 - **Node.js** (v22.x or later)
+- **Bun** (v1.0.0 or later)
 - **npm** (v10.x or later)
 - **AWS CLI** (configured with your credentials)
 - **Docker** (optional, for local container Orchestration)
@@ -19,16 +20,16 @@ Before you begin, ensure you have the following installed on your machine:
 
 1. **Clone the repository:**
 
-    ```bash
-    git clone <repository-url>
-    cd keysely-admin-panel-backend
-    ```
+   ```bash
+   git clone <repository-url>
+   cd keysely-admin-panel-backend
+   ```
 
 2. **Install dependencies:**
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   bun install
+   ```
 
 ## Local Development
 
@@ -38,10 +39,10 @@ You can run the backend services locally using Docker Compose.
 
 ```bash
 # Start the services
-npm run docker:up
+bun run docker:up
 
 # Stop the services
-npm run docker:down
+bun run docker:down
 ```
 
 ### Running Locally (Native)
@@ -49,10 +50,10 @@ npm run docker:down
 To run the server locally without Docker:
 
 ```bash
-# Start the local server
-npm start
-# OR simply build and watch for changes
-npm run watch
+# Start the local server (uses Bun for fast reloading)
+bun run dev
+
+# The server will reload automatically on changes
 ```
 
 ## Scripts
@@ -61,21 +62,21 @@ The `package.json` file includes several helpful scripts for development and dep
 
 ### Build & Test
 
-- `npm run build`: Compiles the TypeScript code to JavaScript.
-- `npm run watch`: Compiles the code in watch mode.
-- `npm test`: Runs the Jest test suite.
+- `bun run build`: Compiles the TypeScript code to JavaScript.
+- `bun run watch`: Compiles the code in watch mode.
+- `bun run test`: Runs the Jest test suite.
 
 ### Code Quality
 
-- `npm run lint`: Runs ESLint to check for code quality issues.
-- `npm run lint:fix`: Automatically fixes linting errors.
-- `npm run format`: Formats code using Prettier.
+- `bun run lint`: Runs ESLint to check for code quality issues.
+- `bun run lint:fix`: Automatically fixes linting errors.
+- `bun run format`: Formats code using Prettier.
 
 ### Infrastructure (CDK)
 
-- `npm run cdk:synth`: Synthesizes the CloudFormation template for the stack.
-- `npm run cdk:diff`: Compares the local stack with the deployed stack.
-- `npm run cdk:deploy`: Deploys the stack to your default AWS account/region.
+- `bun run cdk:synth`: Synthesizes the CloudFormation template for the stack.
+- `bun run cdk:diff`: Compares the local stack with the deployed stack.
+- `bun run cdk:deploy`: Deploys the stack to your default AWS account/region.
 
 ## Project Structure
 
